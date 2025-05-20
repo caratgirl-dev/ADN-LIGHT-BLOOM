@@ -1,0 +1,633 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>ADN - Amour Des Nouveaux</title>
+   <link rel="shortcut icon" href="Capture d'écran 2025-05-06 010250.png" type="image/x-icon">
+  <!-- Bootstrap -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <!-- Font Awesome -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+  <!-- Chart.js -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- jsPDF -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+
+  <style>
+    :root {
+      --primary: #d9e48f;
+      --light: #ffffff;
+      --dark: #222222;
+      --accent: #9cc83a;
+      --danger: #e74c3c;
+      --warning: #f39c12;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--light);
+      scroll-behavior: smooth;
+      color: var(--dark);
+      padding-bottom: 60px;
+    }
+
+    header {
+      background: var(--light);
+      border-top: 12px solid var(--primary);
+      padding: 15px 20px;
+      box-shadow: 0 4px 14px rgba(0,0,0,0.07);
+      position: sticky;
+      top: 0;
+      z-index: 1000;
+    }
+
+    header img {
+      height: 45px;
+      margin-right: 12px;
+    }
+
+    .nav-link {
+      color: var(--dark);
+      font-weight: 700;
+      font-size: 1rem;
+      margin-left: 15px;
+      transition: color 0.3s ease;
+    }
+
+    .nav-link:hover, .nav-link.active {
+      color: var(--primary);
+      text-decoration: underline;
+    }
+
+    section {
+      padding: 50px 15px 60px;
+      max-width: 960px;
+      margin: auto;
+    }
+
+    h2 {
+      color: var(--primary);
+      font-weight: 900;
+      text-align: center;
+      margin-bottom: 35px;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      text-shadow: 1px 1px 2px #aabb66aa;
+    }
+
+    .btn-custom {
+      background-color: var(--primary);
+      color: var(--dark);
+      font-weight: 700;
+      border-radius: 25px;
+      padding: 12px 32px;
+      transition: background-color 0.3s ease;
+      border: none;
+      box-shadow: 0 4px 8px rgb(217 228 143 / 0.45);
+    }
+
+    .btn-custom:hover {
+      background-color: var(--accent);
+      color: var(--light);
+      box-shadow: 0 6px 12px rgb(156 200 58 / 0.75);
+    }
+
+    .form-control, .form-select, textarea.form-control {
+      border-radius: 12px;
+      border: 1.5px solid #cdd3b6;
+      padding: 12px 15px;
+      font-size: 1rem;
+      transition: border-color 0.3s ease;
+      box-shadow: inset 0 2px 5px rgb(0 0 0 / 0.05);
+    }
+
+    .form-control:focus, .form-select:focus, textarea.form-control:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 8px var(--primary);
+    }
+
+    .member-card {
+      border: 1px solid #eee;
+      border-radius: 15px;
+      padding: 15px;
+      box-shadow: 0 3px 12px rgba(0,0,0,0.07);
+      background: #fafaf7;
+      transition: transform 0.25s ease, box-shadow 0.3s ease;
+      display: flex;
+      align-items: center;
+      gap: 15px;
+    }
+
+    .member-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+    }
+
+    .member-photo {
+      width: 70px;
+      height: 70px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2.5px solid var(--primary);
+      flex-shrink: 0;
+      background: #e7f0b9;
+      box-shadow: 0 2px 8px rgba(156,200,58,0.4);
+    }
+
+    .member-info {
+      flex-grow: 1;
+    }
+
+    .member-info h5 {
+      margin-bottom: 4px;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: var(--accent);
+      text-shadow: 1px 1px 1px #b6cc73;
+    }
+
+    .member-info p {
+      margin: 2px 0;
+      font-size: 0.9rem;
+      color: #555;
+    }
+
+    .btn-sm {
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      box-shadow: 0 2px 6px rgb(0 0 0 / 0.1);
+    }
+
+    footer {
+      background-color: var(--primary);
+      text-align: center;
+      color: var(--dark);
+      padding: 18px 10px;
+      font-weight: 600;
+      position: fixed;
+      bottom: 0;
+      width: 100%;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.1);
+    }
+
+    /* Calendrier Anniversaires */
+    #calendar {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 18px;
+    }
+
+    .calendar-cell {
+      background: #f7f9e8;
+      border-radius: 10px;
+      padding: 12px 10px;
+      min-height: 100px;
+      box-shadow: inset 0 1px 3px rgb(0 0 0 / 0.07);
+      color: var(--accent);
+      font-weight: 700;
+      text-align: center;
+      font-size: 0.9rem;
+    }
+
+    .calendar-cell div {
+      margin-top: 6px;
+      font-weight: 500;
+      font-size: 0.85rem;
+      color: #555;
+      text-shadow: none;
+    }
+
+    /* Recherche + filtres */
+    #liste .top-controls {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 25px;
+      justify-content: center;
+    }
+
+    #search, #filterStatut {
+      max-width: 280px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      section {
+        padding: 35px 15px 50px;
+      }
+      #calendar {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      header h4 {
+        font-size: 1.1rem;
+      }
+      .nav-link {
+        font-size: 0.9rem;
+        margin-left: 10px;
+      }
+      .member-card {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+      .member-photo {
+        width: 100%;
+        height: auto;
+        border-radius: 10px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+<!-- Header -->
+<header class="d-flex justify-content-between align-items-center px-3">
+  <div class="d-flex align-items-center">
+    <img src="Capture d'écran 2025-05-06 010250.png" alt="Logo ADN" />
+    <h4 class="mb-0 fw-bold">ADN – Amour Des Nouveaux</h4>
+  </div>
+  <nav>
+    <a href="#ajout" class="nav-link active">Accueil</a>
+    <a href="#liste" class="nav-link">Liste</a>
+    <a href="#anniversaires" class="nav-link">Anniversaires</a>
+    <a href="#stats" class="nav-link">Statistiques</a>
+  </nav>
+</header>
+
+<!-- Ajouter -->
+<section id="ajout" class="container">
+  <h2>Ajouter un Membre</h2>
+  <form id="form" class="row g-3">
+    <div class="col-md-6">
+      <input type="text" class="form-control" id="nom" placeholder="Nom complet" required />
+    </div>
+    <div class="col-md-3">
+      <input type="number" class="form-control" id="age" placeholder="Âge" min="1" max="120" required />
+    </div>
+    <div class="col-md-3">
+      <select class="form-select" id="sexe" required>
+        <option value="">Sexe</option>
+        <option value="Masculin">Masculin</option>
+        <option value="Féminin">Féminin</option>
+      </select>
+    </div>
+    <div class="col-md-6">
+      <input type="date" class="form-control" id="anniversaire" placeholder="Date de naissance" required />
+    </div>
+    <div class="col-md-6">
+      <input type="date" class="form-control" id="dateArrivee" placeholder="Date d'arrivée dans le département" required />
+    </div>
+    <div class="col-md-6">
+      <select class="form-select" id="statut" required>
+        <option value="">Statut</option>
+        <option value="Nouveau">Nouveau</option>
+        <option value="En Formation">En Formation</option>
+        <option value="Actif">Actif</option>
+      </select>
+    </div>
+    <div class="col-md-6">
+      <input type="file" class="form-control" id="photo" accept="image/*" />
+    </div>
+
+    <div class="col-12 text-center">
+      <button type="submit" class="btn btn-custom px-4">Ajouter / Modifier</button>
+      <button type="button" id="btnClear" class="btn btn-danger ms-2 px-4">Annuler</button>
+    </div>
+  </form>
+</section>
+
+<!-- Liste -->
+<section id="liste" class="container">
+  <h2>Liste des Membres</h2>
+
+  <div class="top-controls mb-4 justify-content-center">
+    <input type="search" id="search" class="form-control" placeholder="Recherche par nom..." />
+    <select id="filterStatut" class="form-select">
+      <option value="">Filtrer par statut</option>
+      <option value="Nouveau">Nouveau</option>
+      <option value="En Formation">En Formation</option>
+      <option value="Actif">Actif</option>
+    </select>
+  </div>
+
+  <div id="listeMembres" class="d-flex flex-column gap-3"></div>
+</section>
+
+<!-- Anniversaires -->
+<section id="anniversaires" class="container">
+  <h2>Calendrier des Anniversaires</h2>
+  <div id="calendar"></div>
+</section>
+
+<!-- Statistiques -->
+<section id="stats" class="container">
+  <h2>Statistiques des Membres</h2>
+  <canvas id="statChart" height="150"></canvas>
+  <!-- Canvas pour sexe créé dynamiquement en JS -->
+</section>
+
+<!-- Footer -->
+<footer>
+  &copy; 2025 ADN - Amour Des Nouveaux | Tous droits réservés
+</footer>
+
+<script>
+  // Global tableau membres
+  let membres = JSON.parse(localStorage.getItem('adn_membres')) || [];
+  let membreEnEdition = null;
+
+  const form = document.getElementById('form');
+  const nomInput = document.getElementById('nom');
+  const ageInput = document.getElementById('age');
+  const sexeInput = document.getElementById('sexe');
+  const anniversaireInput = document.getElementById('anniversaire');
+  const dateArriveeInput = document.getElementById('dateArrivee');
+  const statutInput = document.getElementById('statut');
+  const photoInput = document.getElementById('photo');
+
+  const searchInput = document.getElementById('search');
+  const filterStatut = document.getElementById('filterStatut');
+  const listeMembresDiv = document.getElementById('listeMembres');
+
+  // Sauvegarde dans localStorage
+  function sauvegarder() {
+    localStorage.setItem('adn_membres', JSON.stringify(membres));
+  }
+
+  // Convertir image en base64
+  function toBase64(file) {
+    return new Promise((resolve, reject) => {
+      if (!file) resolve(null);
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = err => reject(err);
+      reader.readAsDataURL(file);
+    });
+  }
+
+  // Afficher liste
+  function afficherListe() {
+    const recherche = searchInput.value.trim().toLowerCase();
+    const statutFiltre = filterStatut.value;
+
+    let affichage = membres.filter(mb => {
+      const nomMatch = mb.nom.toLowerCase().includes(recherche);
+      const statutMatch = statutFiltre ? mb.statut === statutFiltre : true;
+      return nomMatch && statutMatch;
+    });
+
+    if (affichage.length === 0) {
+      listeMembresDiv.innerHTML = `<p class="text-center fst-italic">Aucun membre trouvé.</p>`;
+      return;
+    }
+
+    listeMembresDiv.innerHTML = '';
+    affichage.forEach((mb, i) => {
+      const div = document.createElement('div');
+      div.className = 'member-card';
+
+      const photoHTML = mb.photo ? `<img src="${mb.photo}" alt="Photo de ${mb.nom}" class="member-photo" />`
+                                : `<div class="member-photo d-flex justify-content-center align-items-center" style="background:#cdd3b6; color:#7eaa1e; font-weight:bold;">N/A</div>`;
+
+      div.innerHTML = `
+        ${photoHTML}
+        <div class="member-info">
+          <h5>${mb.nom}</h5>
+          <p><strong>Âge:</strong> ${mb.age}</p>
+          <p><strong>Sexe:</strong> ${mb.sexe}</p>
+          <p><strong>Anniversaire:</strong> ${mb.anniversaire}</p>
+          <p><strong>Date arrivée:</strong> ${mb.dateArrivee}</p>
+          <p><strong>Statut:</strong> <span style="color:${getStatutColor(mb.statut)}">${mb.statut}</span></p>
+        </div>
+        <div>
+          <button class="btn btn-sm btn-primary btn-modifier" data-index="${i}" title="Modifier"><i class="fa fa-pen"></i></button>
+          <button class="btn btn-sm btn-danger btn-supprimer" data-index="${i}" title="Supprimer"><i class="fa fa-trash"></i></button>
+        </div>
+      `;
+      listeMembresDiv.appendChild(div);
+    });
+
+    // Événements boutons modifier
+    document.querySelectorAll('.btn-modifier').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const index = btn.dataset.index;
+        chargerMembre(membres[index], index);
+      });
+    });
+
+    // Événements boutons supprimer
+    document.querySelectorAll('.btn-supprimer').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const index = btn.dataset.index;
+        if(confirm(`Supprimer le membre ${membres[index].nom} ?`)) {
+          membres.splice(index, 1);
+          sauvegarder();
+          afficherListe();
+          afficherAnniversaires();
+          afficherStats();
+          reinitialiserForm();
+        }
+      });
+    });
+  }
+
+  // Charger un membre dans le formulaire pour édition
+  function chargerMembre(mb, index) {
+    membreEnEdition = index;
+    nomInput.value = mb.nom;
+    ageInput.value = mb.age;
+    sexeInput.value = mb.sexe;
+    anniversaireInput.value = mb.anniversaire;
+    dateArriveeInput.value = mb.dateArrivee;
+    statutInput.value = mb.statut;
+    // Ne pas recharger la photo dans l'input file (c'est impossible)
+    photoInput.value = '';
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // Reset formulaire
+  function reinitialiserForm() {
+    membreEnEdition = null;
+    form.reset();
+  }
+
+  // Couleur selon statut
+  function getStatutColor(statut) {
+    switch(statut) {
+      case 'Nouveau': return '#7eaa1e';
+      case 'En Formation': return '#9cc83a';
+      case 'Actif': return '#b7d66e';
+      default: return '#777';
+    }
+  }
+
+  // Gestion soumission formulaire
+  form.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    // Validation simplifiée
+    if(!nomInput.value.trim() || !ageInput.value || !sexeInput.value || !anniversaireInput.value || !dateArriveeInput.value || !statutInput.value) {
+      alert('Veuillez remplir tous les champs obligatoires.');
+      return;
+    }
+
+    let photoBase64 = null;
+    if(photoInput.files.length > 0) {
+      try {
+        photoBase64 = await toBase64(photoInput.files[0]);
+      } catch {
+        alert('Erreur lors du chargement de la photo.');
+        return;
+      }
+    }
+
+    const membreObj = {
+      nom: nomInput.value.trim(),
+      age: Number(ageInput.value),
+      sexe: sexeInput.value,
+      anniversaire: anniversaireInput.value,
+      dateArrivee: dateArriveeInput.value,
+      statut: statutInput.value,
+      photo: photoBase64 || (membreEnEdition !== null ? membres[membreEnEdition].photo : null)
+    };
+
+    if(membreEnEdition === null) {
+      membres.push(membreObj);
+    } else {
+      membres[membreEnEdition] = membreObj;
+    }
+
+    sauvegarder();
+    afficherListe();
+    afficherAnniversaires();
+    afficherStats();
+    reinitialiserForm();
+  });
+
+  // Bouton annuler / reset
+  document.getElementById('btnClear').addEventListener('click', () => {
+    reinitialiserForm();
+  });
+
+  // Recherche et filtre
+  searchInput.addEventListener('input', afficherListe);
+  filterStatut.addEventListener('change', afficherListe);
+
+  // Calendrier anniversaires
+  function afficherAnniversaires() {
+    const calendar = document.getElementById('calendar');
+    calendar.innerHTML = '';
+    const mois = [
+      'Janvier','Février','Mars','Avril','Mai','Juin',
+      'Juillet','Août','Septembre','Octobre','Novembre','Décembre'
+    ];
+    for(let m=0; m<12; m++) {
+      const div = document.createElement('div');
+      div.classList.add('calendar-cell');
+      div.innerHTML = `<strong>${mois[m]}</strong>`;
+      const membresDuMois = membres.filter(mb => {
+        if(!mb.anniversaire) return false;
+        const dt = new Date(mb.anniversaire + 'T00:00:00');
+        return dt.getMonth() === m;
+      });
+      membresDuMois.forEach(mb => {
+        const dt = new Date(mb.anniversaire + 'T00:00:00');
+        const day = dt.getDate();
+        div.innerHTML += `<div>${day} - ${mb.nom}</div>`;
+      });
+      calendar.appendChild(div);
+    }
+  }
+
+  // Statistiques Chart.js
+  let chartInstanceStatut = null;
+  let chartInstanceSexe = null;
+
+  function afficherStats() {
+    const ctxStatut = document.getElementById('statChart').getContext('2d');
+    if (!document.getElementById('statSexeChart')) {
+      const sexeCanvas = document.createElement('canvas');
+      sexeCanvas.id = 'statSexeChart';
+      sexeCanvas.height = 150;
+      sexeCanvas.style.marginTop = '30px';
+      document.getElementById('stats').appendChild(sexeCanvas);
+    }
+    const ctxSexe = document.getElementById('statSexeChart').getContext('2d');
+
+    const statuts = ['Nouveau', 'En Formation', 'Actif'];
+    const sexes = ['Masculin', 'Féminin'];
+
+    const countsStatut = statuts.map(st => membres.filter(mb => mb.statut === st).length);
+    const countsSexe = sexes.map(sx => membres.filter(mb => mb.sexe === sx).length);
+
+    if(chartInstanceStatut) chartInstanceStatut.destroy();
+    if(chartInstanceSexe) chartInstanceSexe.destroy();
+
+    chartInstanceStatut = new Chart(ctxStatut, {
+      type: 'bar',
+      data: {
+        labels: statuts,
+        datasets: [{
+          label: 'Nombre de membres',
+          data: countsStatut,
+          backgroundColor: ['#b7d66e', '#9cc83a', '#7eaa1e'],
+          borderRadius: 6,
+          borderSkipped: false,
+          maxBarThickness: 50,
+        }]
+      },
+      options: {
+        responsive: true,
+        scales: {
+          y: { beginAtZero: true, stepSize: 1, precision: 0 }
+        },
+        plugins: {
+          legend: { display: false },
+          tooltip: {
+            callbacks: {
+              label: ctx => ctx.parsed.y + ' membres'
+            }
+          }
+        }
+      }
+    });
+
+    chartInstanceSexe = new Chart(ctxSexe, {
+      type: 'doughnut',
+      data: {
+        labels: sexes,
+        datasets: [{
+          label: 'Répartition par sexe',
+          data: countsSexe,
+          backgroundColor: ['#3a86ff', '#ff5d8f'],
+          hoverOffset: 30,
+          borderWidth: 1
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: {
+          legend: { position: 'bottom' },
+          tooltip: {
+            callbacks: {
+              label: ctx => ctx.label + ': ' + ctx.parsed + ' membres'
+            }
+          }
+        }
+      }
+    });
+  }
+
+  // Initialisation affichages au chargement
+  afficherListe();
+  afficherAnniversaires();
+  afficherStats();
+
+</script>
+</body>
+</html>
